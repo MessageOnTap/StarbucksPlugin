@@ -34,7 +34,7 @@ import edu.cmu.chimps.messageontap_api.Tag;
 import edu.cmu.chimps.messageontap_api.Trigger;
 
 
-public class StarbucksPlugin extends MessageOnTapPlugin{
+public class StarbucksPlugin extends MessageOnTapPlugin {
 
     public static final String TAG = "StarbucksPlugin";
     Long mTidShowBubble;
@@ -58,7 +58,7 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
         Set<Tag> tagList = new HashSet<>();
         Set<Trigger> triggerList = new HashSet<>();
         tagList.add(tag_Coffee);
-       // tagList.add(tag_verb);
+        // tagList.add(tag_verb);
         Set<String> mMandatory = new HashSet<>();
 
         // Category one: show calendar
@@ -84,8 +84,8 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
         //reqParams.put("key2", "value2");
         //reqParams.put("key3", "value3");
         params.put(ServiceAttributes.UI.BUBBLE_FIRST_LINE, "Starbucks Plugin");
-        params.put(ServiceAttributes.UI.BUBBLE_SECOND_LINE,"Order Coffee?");
-        params.put(ServiceAttributes.UI.ICON_TYPE_STRING,R.string.fa_calendar);
+        params.put(ServiceAttributes.UI.BUBBLE_SECOND_LINE, "Order Coffee?");
+        params.put(ServiceAttributes.UI.ICON_TYPE_STRING, R.string.fa_calendar);
 
         // TID is something we might need to implement stateflow inside a plugin.
         mTidShowBubble = createTask(sid, MethodConstants.UI_TYPE, MethodConstants.UI_METHOD_SHOW_BUBBLE, params);
@@ -98,7 +98,7 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
         Log.e(TAG, "Got task response!");
         Log.e(TAG, JSONUtils.hashMapToString(params));
         if (tid == mTidShowBubble) {
-            Log.e(TAG, "TID is right " );
+            Log.e(TAG, "TID is right ");
             if (params.get("status").equals("clicked")) {
                 Log.e(TAG, "button clicked");
                 //HashMap<String, Object> newParams = new HashMap<>();
@@ -111,7 +111,8 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
                 if (!scriptName.isEmpty()) {
                     sugiliteIntent.putExtra("arg1", scriptName);
                     sugiliteIntent.putExtra("arg2", "Run Script Complete");
-                    startActivity(sugiliteIntent);}
+                    startActivity(sugiliteIntent);
+                }
                 endSession(sid);
                 Log.e(TAG, "Ending session " + sid);
                 Log.e(TAG, "Action officially run" + sid);
@@ -122,7 +123,7 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
                 startActivity(intent);
                 */
             }
-        }else{
+        } else {
             Log.e(TAG, "Ending session " + sid);
             endSession(sid);
             Log.e(TAG, "Session ended");

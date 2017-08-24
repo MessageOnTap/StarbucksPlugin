@@ -42,8 +42,9 @@ public class StarbucksSettingActivity extends AppCompatActivity {
     RecyclerView mRecyclerView;
     private int mBackPressedCount;
     public static FlagChangeListener listener;
+
     public static void setFlagChangeListener(FlagChangeListener icl) {
-         listener = icl;
+        listener = icl;
     }
 
     @Override
@@ -59,8 +60,8 @@ public class StarbucksSettingActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        switch (requestCode){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
             case 1:
                 if (resultCode == RESULT_OK && data != null) {
                     String sResult = data.getStringExtra("result");
@@ -70,7 +71,7 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                     if (!sResult.isEmpty()) {
                         result = rehandledResultArrayList(sResult);
                         Script.scriptList.clear();
-                        for (String str : result){
+                        for (String str : result) {
                             Script script = new Script(str);
                             Script.scriptList.add(script);
                         }
@@ -79,7 +80,7 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                         Snackbar snackbar = Snackbar
                                 .make(findViewById(R.id.recyclerview), "Scripts have been updated", Snackbar.LENGTH_LONG);
                         snackbar.show();
-                    }else{
+                    } else {
                         Snackbar snackbar = Snackbar
                                 .make(findViewById(R.id.recyclerview), "No Script", Snackbar.LENGTH_LONG);
                         snackbar.show();
@@ -88,7 +89,7 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                 break;
         }
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,14 +154,15 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                 ScriptStorage.storeScript(StarbucksSettingActivity.this, Script.getSelectedName());//if scriptName is empty, save "empty"
                 Toast.makeText(StarbucksSettingActivity.this, "script saved", Toast.LENGTH_SHORT).show();
             }
-        });        
+        });
     }
+
     //turn the json string into Arraylist
-    protected ArrayList<String> rehandledResultArrayList(String json){
+    protected ArrayList<String> rehandledResultArrayList(String json) {
         ArrayList<String> result = new ArrayList<>();
         String nJson = json;
         nJson = nJson.substring(2);
-        nJson = nJson.substring(0,nJson.length()-2);
+        nJson = nJson.substring(0, nJson.length() - 2);
         String[] nJsonString = nJson.split("\",\"");
         Collections.addAll(result, nJsonString);
         return result;

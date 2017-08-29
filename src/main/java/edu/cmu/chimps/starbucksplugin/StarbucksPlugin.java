@@ -17,7 +17,6 @@ package edu.cmu.chimps.starbucksplugin;
 import android.content.Intent;
 import android.util.Log;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -25,43 +24,39 @@ import java.util.Set;
 import edu.cmu.chimps.messageontap_api.JSONUtils;
 import edu.cmu.chimps.messageontap_api.MessageOnTapPlugin;
 import edu.cmu.chimps.messageontap_api.MethodConstants;
-import edu.cmu.chimps.messageontap_api.PluginData;
+import edu.cmu.chimps.messageontap_api.ParseTree;
+import edu.cmu.chimps.messageontap_api.SemanticTemplate;
 import edu.cmu.chimps.messageontap_api.ServiceAttributes;
 import edu.cmu.chimps.messageontap_api.Tag;
-import edu.cmu.chimps.messageontap_api.Trigger;
 
 
 public class StarbucksPlugin extends MessageOnTapPlugin{
 
     public static final String TAG = "StarbucksPlugin";
     private Long mTidShowBubble;
-    private Tag tag_Coffee = new Tag("TAG_COFFEE", new HashSet<>(Collections.singletonList("(coffee|Coffee|StarbucksSettingActivity|starbucks)")));
+    public static final String SEMANTIC_TEMPLATE_COFFEE = "coffee";
 
-    /**
-     * Return the trigger criteria of this plug-in. This will be called when
-     * MessageOnTap is started (when this plugin is already enabled) or when
-     * this plugin is being enabled.
-     *
-     * @return PluginData containing the trigger
-     */
     @Override
-    protected PluginData iPluginData() {
-        Log.e(TAG, "getting plugin data");
-        Set<Tag> tagList = new HashSet<>();
-        Set<Trigger> triggerList = new HashSet<>();
-        tagList.add(tag_Coffee);
-        Set<String> mMandatory = new HashSet<>();
-        // Category one: show calendar
-        // trigger1: are you free tomorrow? incoming
-        mMandatory.add("TAG_COFFEE");
-        mMandatory.add("TAG_VERB");
-        Trigger trigger1 = new Trigger("starbucks_trigger", mMandatory);
+    protected Set<SemanticTemplate> semanticTemplates() {
+        Set<SemanticTemplate> templates = new HashSet<>();
 
-        triggerList.add(trigger1);
+        Set<Tag> tags = new HashSet<>();
+        Set<String> reSet = new HashSet<>();
+        reSet.add("coffee");
+        reSet.add("cafe");
+        reSet.add("starbucks");
+        reSet.add("cappuccino");
+        reSet.add("latte");
+        reSet.add("frappuccino");
 
-        return new PluginData().triggerSet(JSONUtils.simpleObjectToJson(triggerList, JSONUtils.TYPE_TRIGGER_SET))
-                .tagSet(JSONUtils.simpleObjectToJson(tagList, JSONUtils.TYPE_TAG_SET));
+        tags.add(new Tag(ServiceAttributes.Internal.TAG_TIME,
+                new HashSet<String>(), Tag.Type.MANDATORY));
+        tags.add(new Tag("tag_coffee", reSet, Tag.Type.MANDATORY));
+        templates.add(new SemanticTemplate().name(SEMANTIC_TEMPLATE_COFFEE)
+                .tags(tags)
+                .direction(ParseTree.Direction.INCOMING));
 
+        return templates;
     }
 
     @Override
@@ -85,7 +80,7 @@ public class StarbucksPlugin extends MessageOnTapPlugin{
         Log.e(TAG, JSONUtils.hashMapToString(params));
         if (tid == mTidShowBubble) {
             Log.e(TAG, "TID is right " );
-            if (params.get("status").equals("clicked")) {
+            if (params.get(ServiceAttributes.UI.STATUS).equals(ServiceAttributes.UI.Status.CLICKED)) {
                 Log.e(TAG, "button clicked");
                 Intent sugiliteIntent = new Intent("edu.cmu.hcii.sugilite.COMMUNICATION");
                 sugiliteIntent.addCategory("android.intent.category.DEFAULT");

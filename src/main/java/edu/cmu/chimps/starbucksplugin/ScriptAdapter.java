@@ -1,12 +1,9 @@
 /*
   Copyright 2017 CHIMPS Lab, Carnegie Mellon University
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,7 +23,6 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.List;
 
 
@@ -34,27 +30,27 @@ public class ScriptAdapter extends RecyclerView.Adapter<ScriptAdapter.ViewHolder
     private List<Script> mScriptList;
     protected Toolbar mToolbar;
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        View mContactView;
-        ImageView mContactImage;
-        TextView mContactName;
-        LinearLayout mContactLayout;
-        CheckBox mContactCheckBox;
+    public ScriptAdapter(List<Script> mScriptList, Toolbar toolbar) {
+        this.mScriptList = mScriptList;
+        this.mToolbar = toolbar;
+    }
+    static class ViewHolder extends RecyclerView.ViewHolder{
+        private View mContactView;
+        private ImageView mContactImage;
+        private TextView mContactName;
+        private LinearLayout mContactLayout;
+        private CheckBox mContactCheckBox;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mContactView = itemView;
-            mContactLayout = itemView.findViewById(R.id.linearLayout);
-            mContactImage = itemView.findViewById(R.id.contact_image);
+            mContactLayout =  itemView.findViewById(R.id.linearLayout);
+            mContactImage =  itemView.findViewById(R.id.contact_image);
             mContactName = itemView.findViewById(R.id.contact_name);
             mContactCheckBox = itemView.findViewById(R.id.contact_checkbox);
         }
     }
 
-    public ScriptAdapter(List<Script> mScriptList, Toolbar toolbar) {
-        this.mScriptList = mScriptList;
-        this.mToolbar = toolbar;
-    }
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
@@ -65,11 +61,11 @@ public class ScriptAdapter extends RecyclerView.Adapter<ScriptAdapter.ViewHolder
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 Script script = mScriptList.get(position);
-                if (!script.isFlag()) {
-                    Script.SetAllFlag(false);
+                if (!script.isFlag()){
+                    Script.setAllFlags(false);
                     script.setFlag(true);
-                } else {
-                    Script.SetAllFlag(false);
+                }else {
+                    Script.setAllFlags(false);
                 }
                 StarbucksSettingActivity.listener.onChange(true);
                 //Toast.makeText(view.getContext(), "click " + "position:"+position, Toast.LENGTH_SHORT).show();
@@ -83,47 +79,46 @@ public class ScriptAdapter extends RecyclerView.Adapter<ScriptAdapter.ViewHolder
         Script script = mScriptList.get(position);
         holder.mContactImage.setImageDrawable(script.getContactPicture());
         holder.mContactName.setText(script.getName());
-        SetSelection(holder, script);
+        setSelection(holder, script);
     }
 
     @Override
     public int getItemCount() {
         return mScriptList.size();
     }
-
-    public static void SetSelection(ViewHolder holder, Script script) {
-        if (script.isFlag()) {
+    private static void setSelection(ViewHolder holder, Script script){
+        if (script.isFlag()){
             holder.mContactCheckBox.setChecked(true);
-        } else {
+        }else {
             holder.mContactCheckBox.setChecked(false);
         }
     }
 
-    public static void SetAllSelectionByBoolean(Boolean selection, RecyclerView recyclerView) {
+    private static void setAllSelectionByBoolean(Boolean selection, RecyclerView recyclerView){
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
             ViewHolder holder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
             holder.mContactCheckBox.setChecked(selection);
         }
     }
-
-    public static void SetAllSelection(RecyclerView recyclerView) {
+    
+    public static void setAllSelection(RecyclerView recyclerView){
         for (int i = 0; i < recyclerView.getChildCount(); i++) {
             ViewHolder holder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
             holder.mContactCheckBox.setChecked(false);
         }
-        if (Script.scriptList.size() == 0) {
-            SetAllSelectionByBoolean(false, recyclerView);
-        } else {
+        if (Script.scriptList.size() == 0){
+            setAllSelectionByBoolean(false,recyclerView);
+        } else{
             for (Script script : Script.scriptList) {
                 for (int i = 0; i < recyclerView.getChildCount(); i++) {
                     ViewHolder holder = (ViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
-                    if (script.getName().equals(holder.mContactName.getText())) {
-                        if (script.isFlag()) {
+                    if (script.getName().equals(holder.mContactName.getText())){
+                        if (script.isFlag()){
                             holder.mContactCheckBox.setChecked(true);
                         } else {
                             holder.mContactCheckBox.setChecked(false);
                         }
-                        Log.i("Script", "SetAllSavedSelection: " + holder.mContactName.getText() + script.isFlag());
+                        Log.i("Script", "SetAllSavedSelection: "+holder.mContactName.getText() + script.isFlag());
                     }
                 }
             }

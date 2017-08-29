@@ -1,12 +1,9 @@
 /*
   Copyright 2017 CHIMPS Lab, Carnegie Mellon University
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,11 +31,11 @@ import edu.cmu.chimps.messageontap_api.Tag;
 import edu.cmu.chimps.messageontap_api.Trigger;
 
 
-public class StarbucksPlugin extends MessageOnTapPlugin {
+public class StarbucksPlugin extends MessageOnTapPlugin{
 
     public static final String TAG = "StarbucksPlugin";
-    Long mTidShowBubble;
-    Tag tag_Coffee = new Tag("TAG_COFFEE", new HashSet<>(Collections.singletonList("(coffee|Coffee|StarbucksSettingActivity|starbucks)")));
+    private Long mTidShowBubble;
+    private Tag tag_Coffee = new Tag("TAG_COFFEE", new HashSet<>(Collections.singletonList("(coffee|Coffee|StarbucksSettingActivity|starbucks)")));
 
     /**
      * Return the trigger criteria of this plug-in. This will be called when
@@ -50,22 +47,15 @@ public class StarbucksPlugin extends MessageOnTapPlugin {
     @Override
     protected PluginData iPluginData() {
         Log.e(TAG, "getting plugin data");
-        //Set<String> mKeyList = new HashSet<>();
-        //mKeyList.add(EntityAttributes.Graph.Person.NAME);
-        //mKeyList.add(EntityAttributes.Graph.Person.NUMBER);
-        //mKeyList.add(Globals.KEY_QUERY_SUBJECT);
-
         Set<Tag> tagList = new HashSet<>();
         Set<Trigger> triggerList = new HashSet<>();
         tagList.add(tag_Coffee);
-        // tagList.add(tag_verb);
         Set<String> mMandatory = new HashSet<>();
-
         // Category one: show calendar
         // trigger1: are you free tomorrow? incoming
         mMandatory.add("TAG_COFFEE");
         mMandatory.add("TAG_VERB");
-        Trigger trigger1 = new Trigger("calendar_trigger_one", mMandatory);
+        Trigger trigger1 = new Trigger("starbucks_trigger", mMandatory);
 
         triggerList.add(trigger1);
 
@@ -79,13 +69,9 @@ public class StarbucksPlugin extends MessageOnTapPlugin {
         Log.e(TAG, "Session created here!");
         Log.e(TAG, JSONUtils.hashMapToString(params));
         //Log.e(TAG, "parse tree: " + ((ParseTree) JSONUtils.jsonToSimpleObject((String) params.get("tree"), JSONUtils.TYPE_PARSE_TREE)).toString());
-        HashMap<String, Object> reqParams = new HashMap<>();
-        //reqParams.put("key1", "value1");
-        //reqParams.put("key2", "value2");
-        //reqParams.put("key3", "value3");
         params.put(ServiceAttributes.UI.BUBBLE_FIRST_LINE, "Starbucks Plugin");
-        params.put(ServiceAttributes.UI.BUBBLE_SECOND_LINE, "Order Coffee?");
-        params.put(ServiceAttributes.UI.ICON_TYPE_STRING, R.string.fa_calendar);
+        params.put(ServiceAttributes.UI.BUBBLE_SECOND_LINE,"Order Coffee?");
+        params.put(ServiceAttributes.UI.ICON_TYPE_STRING, getResources().getString(R.string.fa_coffee));
 
         // TID is something we might need to implement stateflow inside a plugin.
         mTidShowBubble = createTask(sid, MethodConstants.UI_TYPE, MethodConstants.UI_METHOD_SHOW_BUBBLE, params);
@@ -98,12 +84,9 @@ public class StarbucksPlugin extends MessageOnTapPlugin {
         Log.e(TAG, "Got task response!");
         Log.e(TAG, JSONUtils.hashMapToString(params));
         if (tid == mTidShowBubble) {
-            Log.e(TAG, "TID is right ");
+            Log.e(TAG, "TID is right " );
             if (params.get("status").equals("clicked")) {
                 Log.e(TAG, "button clicked");
-                //HashMap<String, Object> newParams = new HashMap<>();
-                //newParams.put("perform script", "script");
-                //createTask(sid, MethodConstants.ACTION_TYPE,"perform script", newParams);
                 Intent sugiliteIntent = new Intent("edu.cmu.hcii.sugilite.COMMUNICATION");
                 sugiliteIntent.addCategory("android.intent.category.DEFAULT");
                 sugiliteIntent.putExtra("messageType", "RUN_SCRIPT");
@@ -111,19 +94,12 @@ public class StarbucksPlugin extends MessageOnTapPlugin {
                 if (!scriptName.isEmpty()) {
                     sugiliteIntent.putExtra("arg1", scriptName);
                     sugiliteIntent.putExtra("arg2", "Run Script Complete");
-                    startActivity(sugiliteIntent);
-                }
+                    startActivity(sugiliteIntent);}
                 endSession(sid);
                 Log.e(TAG, "Ending session " + sid);
                 Log.e(TAG, "Action officially run" + sid);
-                /*
-                String scriptName = ScriptStorage.getScript(StarbucksPlugin.this);
-                StarbucksIntent.SCRIPT_NAME = scriptName;
-                Intent intent = new Intent(StarbucksPlugin.this,StarbucksIntent.class);
-                startActivity(intent);
-                */
             }
-        } else {
+        }else{
             Log.e(TAG, "Ending session " + sid);
             endSession(sid);
             Log.e(TAG, "Session ended");

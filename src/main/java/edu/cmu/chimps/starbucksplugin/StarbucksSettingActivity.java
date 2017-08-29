@@ -1,12 +1,9 @@
 /*
   Copyright 2017 CHIMPS Lab, Carnegie Mellon University
-
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
-
   http://www.apache.org/licenses/LICENSE-2.0
-
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,20 +28,17 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
 public class StarbucksSettingActivity extends AppCompatActivity {
     public static String TAG = "StarbucksActivity";
-    Toolbar mToolbar;
-    ScriptAdapter mAdapter;
-    RecyclerView mRecyclerView;
+    private Toolbar mToolbar;
+    private ScriptAdapter mAdapter;
+    private RecyclerView mRecyclerView;
     private int mBackPressedCount;
     public static FlagChangeListener listener;
-
     public static void setFlagChangeListener(FlagChangeListener icl) {
-        listener = icl;
+         listener = icl;
     }
 
     @Override
@@ -60,18 +54,18 @@ public class StarbucksSettingActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        switch (requestCode){
             case 1:
                 if (resultCode == RESULT_OK && data != null) {
                     String sResult = data.getStringExtra("result");
                     //ArrayList<String> ResultArray = (ArrayList<String>) JSONUtils.jsonToSimpleObject(SResult,JSONUtils.TYPE_TAG_ARRAY);
                     Log.e(TAG, "onResult:" + sResult);
                     ArrayList<String> result;
-                    if (!sResult.isEmpty()) {
+                    if (sResult != "[]" && sResult != null) {
                         result = rehandledResultArrayList(sResult);
                         Script.scriptList.clear();
-                        for (String str : result) {
+                        for (String str : result){
                             Script script = new Script(str);
                             Script.scriptList.add(script);
                         }
@@ -80,15 +74,18 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                         Snackbar snackbar = Snackbar
                                 .make(findViewById(R.id.recyclerview), "Scripts have been updated", Snackbar.LENGTH_LONG);
                         snackbar.show();
-                    } else {
+                    }else{
                         Snackbar snackbar = Snackbar
-                                .make(findViewById(R.id.recyclerview), "No Script", Snackbar.LENGTH_LONG);
+                                .make(findViewById(R.id.recyclerview), "No Script.Add a script in Sugilite", Snackbar.LENGTH_LONG);
                         snackbar.show();
                     }
                 }
                 break;
+            default:
+                break;
         }
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,12 +96,18 @@ public class StarbucksSettingActivity extends AppCompatActivity {
         Intent sugiliteIntent = new Intent("edu.cmu.hcii.sugilite.COMMUNICATION");
         sugiliteIntent.addCategory("android.intent.category.DEFAULT");
         sugiliteIntent.putExtra("messageType", "GET_SCRIPT_LIST");
-        startActivityForResult(sugiliteIntent, 1);
+        if (sugiliteIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(sugiliteIntent, 1);
+        }else{
+                Toast.makeText(StarbucksSettingActivity.this, "Please Install Sugilite to Start", Toast.LENGTH_SHORT).show();
+            }
+
+
 
         setFlagChangeListener(new FlagChangeListener() {
             @Override
             public void onChange(Boolean wantChange) {
-                if (wantChange) ScriptAdapter.SetAllSelection(mRecyclerView);
+                if (wantChange) ScriptAdapter.setAllSelection(mRecyclerView);
             }
         });
 
@@ -134,7 +137,12 @@ public class StarbucksSettingActivity extends AppCompatActivity {
                         Intent sugiliteIntent = new Intent("edu.cmu.hcii.sugilite.COMMUNICATION");
                         sugiliteIntent.addCategory("android.intent.category.DEFAULT");
                         sugiliteIntent.putExtra("messageType", "GET_SCRIPT_LIST");
-                        startActivityForResult(sugiliteIntent, 1);
+                        if (sugiliteIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivityForResult(sugiliteIntent, 1);
+                        }else
+                        {
+                            Toast.makeText(StarbucksSettingActivity.this, "Please Install Sugilite to Start", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
                 return true;
@@ -151,20 +159,21 @@ public class StarbucksSettingActivity extends AppCompatActivity {
         floatingUndefinedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ScriptStorage.storeScript(StarbucksSettingActivity.this, Script.getSelectedName());//if scriptName is empty, save "empty"
+                ScriptStorage.storeScript(StarbucksSettingActivity.this, Script.getSelectedNames());//if scriptName is empty, save "empty"
                 Toast.makeText(StarbucksSettingActivity.this, "script saved", Toast.LENGTH_SHORT).show();
             }
-        });
+        });        
     }
-
     //turn the json string into Arraylist
-    protected ArrayList<String> rehandledResultArrayList(String json) {
+    protected ArrayList<String> rehandledResultArrayList(String json){
         ArrayList<String> result = new ArrayList<>();
         String nJson = json;
-        nJson = nJson.substring(2);
-        nJson = nJson.substring(0, nJson.length() - 2);
-        String[] nJsonString = nJson.split("\",\"");
-        Collections.addAll(result, nJsonString);
+        if(nJson.length()>2){
+            nJson = nJson.substring(2);
+            nJson = nJson.substring(0, nJson.length()-2);
+            String[] nJsonString = nJson.split("\",\"");
+            Collections.addAll(result, nJsonString);
+        }
         return result;
     }
 }
